@@ -1,5 +1,5 @@
 # breakpointChange
-Trigger a breakpointChange event via jQuery, when CSS media queries trigger
+Trigger a breakpointChange event via jQuery, when CSS media querie breakpoints change
 
 Usage:
 ```js
