@@ -1,3 +1,10 @@
+if (!String.prototype.startsWith) {
+    String.prototype.startsWith = function(searchString, position){
+      position = position || 0;
+      return this.substr(position, searchString.length) === searchString;
+  };
+}
+
 jQuery(function ($) {
 	var sheets = document.styleSheets;
 	
@@ -7,6 +14,15 @@ jQuery(function ($) {
 	//Locate all media queries in all attached stylesheets
 	//This will consider (min-width:1200px) and (max-width:1199px) to be the same breakpoint
 	for (var i = 0; i < sheets.length; i += 1) {
+		try {
+			if(!sheets[i].cssRules)
+			continue;
+		} catch(e) {
+			if(e.name !== 'SecurityError')
+				throw e;
+			continue;
+		}
+		
 		var rules = sheets[i].cssRules;
 
 		if (rules) for (var j = 0; j < rules.length; j += 1) {
@@ -16,13 +32,13 @@ jQuery(function ($) {
 				if (mql.media.startsWith('print')) continue;
 				
 				//If it's a min-width query (recommended)
-				if (res = mql.media.match(/min-width\s?:\s(\d+)(..)/)) {
+				if (res = mql.media.match(/min-width\s?:\s?(\d+)(..)/)) {
 					//If this breakpoint is not already registered, and there's no max-width breakpoint that's 1 pixel smaller
 					if (!breakpoints[res[1]+res[2]] && !breakpoints[(parseInt(res[1])-1)+res[2]]) breakpoints[res[1]+res[2]] = 'min-width';
 				}
 				
 				//If it's a max-width query (not recommended)
-				if (res = mql.media.match(/max-width\s?:\s(\d+)(..)/)) {
+				if (res = mql.media.match(/max-width\s?:\s?(\d+)(..)/)) {
 					//If this breakpoint is not already registered, and there's no min-width breakpoint that's 1 pixel bigger
 					if (!breakpoints[res[1]+res[2]] && !breakpoints[(parseInt(res[1])+1)+res[2]]) breakpoints[res[1]+res[2]] = 'max-width';
 				}
